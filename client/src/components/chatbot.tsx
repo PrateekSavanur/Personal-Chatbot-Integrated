@@ -68,79 +68,71 @@ export default function Chatbot() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {/* Chat Toggle Button */}
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-14 h-14 rounded-full shadow-lg transition-all duration-300 ${
-          isOpen ? "scale-90" : "animate-pulse"
-        }`}
-      >
-        <MessageCircle className="w-6 h-6" />
-      </Button>
-
-      {/* Chat Window */}
+      {/* Chat Window - Show first, then button overlays */}
       {isOpen && (
-        <Card className="absolute bottom-16 right-0 w-80 h-96 border-border shadow-2xl">
-          {/* Chat Header */}
-          <CardHeader className="p-4 border-b border-border">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-3">
-                  <Bot className="w-4 h-4 text-foreground" />
+        <div className="absolute bottom-0 right-0 w-80 mb-16">
+          <Card className="bg-card border border-border shadow-2xl">
+            {/* Chat Header */}
+            <CardHeader className="p-4 border-b border-border bg-card">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-white bg-opacity-10 rounded-full flex items-center justify-center mr-3">
+                    <Bot className="w-4 h-4 text-foreground" />
+                  </div>
+                  <div>
+                    <h3 className="text-foreground font-medium text-sm">Ask about Prateek</h3>
+                    <p className="text-muted-foreground text-xs">AI Assistant</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-foreground font-medium">Ask about Prateek</h3>
-                  <p className="text-muted-foreground text-xs">AI Assistant</p>
-                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsOpen(false)}
+                  className="text-muted-foreground hover:text-foreground h-8 w-8"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsOpen(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-          </CardHeader>
+            </CardHeader>
 
-          {/* Chat Messages */}
-          <CardContent className="p-0">
-            <div className="h-64 overflow-y-auto p-4 space-y-4">
+            {/* Chat Messages */}
+            <div className="h-64 overflow-y-auto p-4 space-y-4 bg-card">
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex items-start ${message.isUser ? "justify-end" : ""}`}
+                  className={`flex items-start ${message.isUser ? "justify-end" : "justify-start"}`}
                 >
                   {!message.isUser && (
-                    <div className="w-6 h-6 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-2 mt-1 flex-shrink-0">
+                    <div className="w-6 h-6 bg-white bg-opacity-10 rounded-full flex items-center justify-center mr-2 mt-1 flex-shrink-0">
                       <Bot className="w-3 h-3 text-foreground" />
                     </div>
                   )}
                   <div
-                    className={`max-w-xs rounded-lg p-3 ${
+                    className={`max-w-[240px] rounded-lg p-3 ${
                       message.isUser
-                        ? "bg-primary text-primary-foreground ml-8"
-                        : "glass"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-foreground"
                     }`}
                   >
-                    <p className={`text-sm ${message.isUser ? "text-primary-foreground" : "text-foreground"}`}>
+                    <p className={`text-sm leading-relaxed whitespace-pre-line ${
+                      message.isUser ? "text-primary-foreground" : "text-foreground"
+                    }`}>
                       {message.content}
                     </p>
                   </div>
                   {message.isUser && (
-                    <div className="w-6 h-6 bg-primary bg-opacity-20 rounded-full flex items-center justify-center ml-2 mt-1 flex-shrink-0">
+                    <div className="w-6 h-6 bg-white bg-opacity-10 rounded-full flex items-center justify-center ml-2 mt-1 flex-shrink-0">
                       <User className="w-3 h-3 text-foreground" />
                     </div>
                   )}
                 </div>
               ))}
               {chatMutation.isPending && (
-                <div className="flex items-start">
-                  <div className="w-6 h-6 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-2 mt-1">
+                <div className="flex items-start justify-start">
+                  <div className="w-6 h-6 bg-white bg-opacity-10 rounded-full flex items-center justify-center mr-2 mt-1">
                     <Bot className="w-3 h-3 text-foreground" />
                   </div>
-                  <div className="glass rounded-lg p-3 max-w-xs">
+                  <div className="bg-muted rounded-lg p-3 max-w-xs">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-foreground rounded-full animate-bounce"></div>
                       <div className="w-2 h-2 bg-foreground rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
@@ -152,27 +144,38 @@ export default function Chatbot() {
             </div>
 
             {/* Chat Input */}
-            <div className="p-4 border-t border-border">
+            <div className="p-4 border-t border-border bg-card">
               <form onSubmit={handleSubmit} className="flex space-x-2">
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   placeholder="Ask about skills, projects..."
-                  className="flex-1 bg-background border-border text-foreground text-sm"
+                  className="flex-1 bg-background border-border text-foreground text-sm h-10"
                   disabled={chatMutation.isPending}
                 />
                 <Button 
                   type="submit" 
                   size="icon"
                   disabled={chatMutation.isPending || !inputMessage.trim()}
+                  className="h-10 w-10"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
               </form>
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+        </div>
       )}
+
+      {/* Chat Toggle Button */}
+      <Button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-14 h-14 rounded-full shadow-lg transition-all duration-300 bg-primary hover:bg-primary/90 text-primary-foreground ${
+          isOpen ? "scale-90" : "hover:scale-110"
+        }`}
+      >
+        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+      </Button>
     </div>
   );
 }
