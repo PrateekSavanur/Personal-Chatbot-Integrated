@@ -18,10 +18,11 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hi! I'm Prateek's AI assistant. Ask me anything about his experience, projects, or skills!",
+      content:
+        "Hi! I'm Prateek's AI assistant. Ask me anything about his experience, projects, or skills!",
       isUser: false,
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    },
   ]);
   const [inputMessage, setInputMessage] = useState("");
 
@@ -35,19 +36,20 @@ export default function Chatbot() {
         id: Date.now().toString() + "-bot",
         content: data.response,
         isUser: false,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, botMessage]);
+      setMessages((prev) => [...prev, botMessage]);
     },
     onError: () => {
       const errorMessage: Message = {
         id: Date.now().toString() + "-error",
-        content: "I'm experiencing some technical difficulties. Please try again later or contact Prateek directly at prateeksavanur@duck.com.",
+        content:
+          "I'm experiencing some technical difficulties. Please try again later or contact Prateek directly at prateeksavanur@duck.com.",
         isUser: false,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
-    }
+      setMessages((prev) => [...prev, errorMessage]);
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,10 +60,10 @@ export default function Chatbot() {
       id: Date.now().toString() + "-user",
       content: inputMessage,
       isUser: true,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     chatMutation.mutate(inputMessage);
     setInputMessage("");
   };
@@ -80,8 +82,12 @@ export default function Chatbot() {
                     <Bot className="w-4 h-4 text-foreground" />
                   </div>
                   <div>
-                    <h3 className="text-foreground font-medium text-sm">Ask about Prateek</h3>
-                    <p className="text-muted-foreground text-xs">AI Assistant</p>
+                    <h3 className="text-foreground font-medium text-sm">
+                      Ask about Prateek
+                    </h3>
+                    <p className="text-muted-foreground text-xs">
+                      AI Assistant
+                    </p>
                   </div>
                 </div>
                 <Button
@@ -114,9 +120,13 @@ export default function Chatbot() {
                         : "bg-muted text-foreground"
                     }`}
                   >
-                    <p className={`text-sm leading-relaxed whitespace-pre-line ${
-                      message.isUser ? "text-primary-foreground" : "text-foreground"
-                    }`}>
+                    <p
+                      className={`text-sm leading-relaxed whitespace-pre-line ${
+                        message.isUser
+                          ? "text-primary-foreground"
+                          : "text-foreground"
+                      }`}
+                    >
                       {message.content}
                     </p>
                   </div>
@@ -135,8 +145,14 @@ export default function Chatbot() {
                   <div className="bg-muted rounded-lg p-3 max-w-xs">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-foreground rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-foreground rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                      <div className="w-2 h-2 bg-foreground rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                      <div
+                        className="w-2 h-2 bg-foreground rounded-full animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-foreground rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
                     </div>
                   </div>
                 </div>
@@ -153,8 +169,8 @@ export default function Chatbot() {
                   className="flex-1 bg-background border-border text-foreground text-sm h-10"
                   disabled={chatMutation.isPending}
                 />
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   size="icon"
                   disabled={chatMutation.isPending || !inputMessage.trim()}
                   className="h-10 w-10"
@@ -174,7 +190,11 @@ export default function Chatbot() {
           isOpen ? "scale-90" : "hover:scale-110"
         }`}
       >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        {isOpen ? (
+          <X className="w-6 h-6" />
+        ) : (
+          <MessageCircle className="w-6 h-6" />
+        )}
       </Button>
     </div>
   );

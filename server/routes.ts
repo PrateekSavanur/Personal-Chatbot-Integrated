@@ -1,12 +1,21 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { insertChatMessageSchema, insertContactSubmissionSchema } from "@shared/schema";
 import { getChatbotResponse } from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+
+  // Apply rate limiting to /api/chat to prevent abuse
+  const chatLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 30, // max 30 requests per minute per IP
+    message: "Too many requests, please try again later."
+  });
+
   // Chatbot endpoint
-  app.post("/api/chat", async (req, res) => {
+  app.post("/api/chat", chatLimiter, async (req, res) => {
     try {
       const { message } = req.body;
 
@@ -14,13 +23,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Message is required" });
       }
 
+      console.log("Received chat message:", message);
+
       const response = await getChatbotResponse(message);
 
       // Save the chat message to storage
-      await storage.saveChatMessage({
-        message,
-        response
-      });
+      await storage.saveChatMessage({ message, response });
 
       res.json({ response });
     } catch (error) {
@@ -33,7 +41,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/contact", async (req, res) => {
     try {
       const validatedData = insertContactSubmissionSchema.parse(req.body);
-
       const submission = await storage.saveContactSubmission(validatedData);
 
       res.json({
@@ -47,17 +54,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get chat history (optional - for admin purposes)
-  app.get("/api/chat/history", async (req, res) => {
-    try {
-      const messages = await storage.getChatMessages();
-      res.json(messages);
-    } catch (error) {
-      console.error("Chat history error:", error);
-      res.status(500).json({ error: "Failed to fetch chat history" });
-    }
-  });
+  // // Get chat history (admin only)
+  // app.get("/api/chat/history", async (req, res) => {
+  //   const authHeader = req.headers.authorization;
+  //   const adminToken = process.env.ADMIN_TOKEN;
 
+  //   if (!adminToken || authHeader !== `Bearer ${adminToken}`) {
+  //     return res.status(401).json({ error: "Unauthorized" });
+  //   }
+
+  //   try {
+  //     const messages = await storage.getChatMessages();
+  //     res.json(messages);
+  //   } catch (error) {
+  //     console.error("Chat history error:", error);
+  //     res.status(500).json({ error: "Failed to fetch chat history" });
+  //   }
+  // });
+
+  // Start the HTTP server
   const httpServer = createServer(app);
   return httpServer;
 }
