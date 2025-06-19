@@ -9,13 +9,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req, res) => {
     try {
       const { message } = req.body;
-      
+
       if (!message) {
         return res.status(400).json({ error: "Message is required" });
       }
 
       const response = await getChatbotResponse(message);
-      
+
       // Save the chat message to storage
       await storage.saveChatMessage({
         message,
@@ -33,13 +33,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/contact", async (req, res) => {
     try {
       const validatedData = insertContactSubmissionSchema.parse(req.body);
-      
+
       const submission = await storage.saveContactSubmission(validatedData);
-      
-      res.json({ 
-        success: true, 
+
+      res.json({
+        success: true,
         message: "Thank you for your message! Prateek will get back to you soon.",
-        id: submission.id 
+        id: submission.id
       });
     } catch (error) {
       console.error("Contact form error:", error);
